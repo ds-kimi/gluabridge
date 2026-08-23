@@ -1,66 +1,56 @@
 # GLuaBridge
 
-Talks to the injected Autorun DLL over a loopback socket (`127.0.0.1:3005`).
+Garry's Mod Lua dumper and executor, inside VSCode.
 
-## What it does
+Talks to the [Autorun](https://github.com/ds-kimi/gluabridge) DLL over a loopback
+socket on `127.0.0.1:3005`. **The DLL must be running inside gmod for anything
+here to work** — see the [project README](https://github.com/ds-kimi/gluabridge)
+for how to set that up.
 
-- **Save = run.** Saving a `.lua` file sends it to the live gmod client. Realm is
-  guessed from the path (`cl_`/`sh_`/`client/`/`vgui/` → client, `menu_`/`menu/` →
-  menu, otherwise `autorun.defaultRealm`).
-- **Dumped server files appear in the explorer.** On connect the extension asks
-  the DLL where `autorun/lua_dumps` lives and adds it as a workspace folder, so
-  the clientside/shared files a server sends you are browsable without digging
-  through your home directory. Requires `filesteal.enabled = true` in
-  `autorun/settings.toml`.
-- **Errors come back.** Lua compile/runtime errors from scripts you sent show as
-  notifications and in the `Autorun` output channel.
-- **Gmod console in a VSCode terminal.** A `Gmod Console` terminal streams the
-  game's console output, and anything you type there runs in the game. Plain
-  lines run as console commands (`sv_cheats 1`); prefix with `>` to run lua
+## Features
+
+* **Save to run.** Saving a `.lua` file executes it in the live client. Realm is
+  guessed from the path (`cl_`/`sh_`/`client/`/`vgui/` → client, `menu_`/`menu/`
+  → menu, otherwise `autorun.defaultRealm`).
+* **Server files in your explorer.** The `lua_dumps` folder is mounted as a
+  workspace folder on connect, so files a server sends you are browsable without
+  digging through your home directory.
+* **The game console, in a terminal.** Streams console output; what you type goes
+  back. Plain lines are console commands (`sv_cheats 1`), a `>` prefix runs Lua
   (`> print(LocalPlayer():Nick())`).
-
-## Setup
-
-1. Enable file stealing in `~/autorun/settings.toml`:
-   ```toml
-   [filesteal]
-   enabled = true
-   ```
-2. Inject Autorun into gmod as usual.
-3. `npm install && npm run compile` in this folder, then run the extension
-   (F5 in VSCode, or package with `vsce package`).
-
-It auto-connects on startup and retries every `autorun.reconnectInterval` ms, so
-injecting after VSCode is already open works fine.
+* **Lua Runner sidebar.** Scratch runner plus editors for the `autorun.lua` and
+  `hook.lua` scripthooks.
 
 ## Commands
 
 | Command | Default key |
 |---|---|
-| `Autorun: Run Current File` | `ctrl+alt+r` |
+| `Autorun: Run Current File` | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> |
 | `Autorun: Run Selection` | |
-| `Autorun: Connect` / `Disconnect` | |
-| `Autorun: Open Dump Folder in Workspace` | |
 | `Autorun: Open Gmod Console` | |
 | `Autorun: Attach Console Capture` | |
+| `Autorun: Focus Lua Runner` | |
+| `Autorun: Open Dump Folder in Workspace` | |
+| `Autorun: Connect` / `Disconnect` | |
 
-## Console capture
+## Settings
 
-Capture works by wrapping `print`/`Msg`/`MsgN`/`MsgC` in the target realm with
-functions that call the original and then tee the text back over the socket. It
-is installed once per realm (guarded by `_AutorunConsoleHooked`) and is
-re-attached with `Autorun: Attach Console Capture` after a map change or
-reconnect. Output printed by the engine itself rather than lua does not pass
-through those functions, so it will not appear.
+| Setting | Default | |
+|---|---|---|
+| `autorun.host` / `autorun.port` | `127.0.0.1` / `3005` | Where the DLL listens |
+| `autorun.runOnSave` | `true` | Send a `.lua` file to the game on save |
+| `autorun.defaultRealm` | `client` | Used when the path gives no hint |
+| `autorun.captureConsole` | `true` | Tee game console output into the terminal |
+| `autorun.openConsoleOnStart` | `true` | Open that terminal on activation |
+| `autorun.autoAddDumpFolder` | `true` | Mount `lua_dumps` as a workspace folder |
+| `autorun.reconnectInterval` | `3000` | Reconnect delay in ms; `0` disables |
 
 ## Security
 
-The socket is unauthenticated and grants arbitrary lua execution in your game
-client. It binds loopback only — do not forward the port or bind it publicly.
+The socket is unauthenticated and grants arbitrary Lua execution in your game
+client. It binds loopback only — do not forward the port.
 
-## Protocol
+## License
 
-Line-delimited JSON, defined in [`../autorun/src/ipc/`](../autorun/src/ipc/) and
-mirrored in [`src/protocol.ts`](src/protocol.ts). Requests carry an `id` that is
-echoed on the response; events (`dump`, `run_result`, `connected`) are pushed
-unsolicited with no id.
+Apache License 2.0. Built on [Autorun-rs](https://github.com/vurvdev/Autorun-rs)
+by Vurv78 and its contributors.
