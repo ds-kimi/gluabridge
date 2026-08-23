@@ -21,7 +21,7 @@ Changes made relative to upstream Autorun-rs:
     lua realm (autorun/src/ipc/console.rs).
   * Emitted IPC events from the existing dumper and painttraverse hooks
     (autorun/src/hooks/).
-  * Added vscode-autorun/ -- the GLuaBridge VSCode extension, a client for the
+  * Added gluabridge/ -- the GLuaBridge VSCode extension, a client for the
     above providing run-on-save, a console terminal, a dump-folder mount and a
     Lua runner sidebar.
   * Removed the unused `lupat` dependency, whose upstream repository no longer

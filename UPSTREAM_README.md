@@ -91,6 +91,3 @@ __If you are using this as a menu plugin 🧩, make sure the DLL is named ``gmsv
 You may want to build this yourself if you want to make changes / contribute (or don't trust github actions for whatever reason..)
 1. [Setup Rust & Cargo](https://www.rust-lang.org/learn/get-started)
 2. Use ``build_win_32.bat`` or ``build_win_64.bat``.
-
-## 🧷 VSCode Extension
-A VSCode extension lives in [`vscode-autorun/`](vscode-autorun/). It connects to Autorun over a loopback socket so you can run lua just by saving a file, and browse the clientside/shared files a server sends you straight from the explorer. See its [README](vscode-autorun/README.md).

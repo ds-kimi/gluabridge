@@ -22,53 +22,82 @@ server sends you, all without leaving your editor.
 Everything upstream does — dumping, scripthook, plugins, the external console —
 still works unchanged.
 
-## Install
+## Download
 
-### 1. The DLL
+Grab both files from the [Release](../../releases/tag/Release) page — it is
+rebuilt automatically on every commit:
 
-Download `gmsv_autorun_win64.dll` from
-[Releases](../../releases/latest), or build it:
+* `gmsv_autorun_win64.dll`
+* `gluabridge.vsix`
+
+Then jump to [Setup](#setup).
+
+## Building it yourself
+
+Two separate pieces. You can build one without the other.
+
+### The DLL
+
+Needs [Rust](https://www.rust-lang.org/tools/install). Nightly, because upstream
+Autorun-rs requires it.
 
 ```sh
 rustup toolchain install nightly
-cd autorun && cargo +nightly build --release
-cp ../target/release/autorun.dll ../gmsv_autorun_win64.dll
+cargo +nightly build --release --manifest-path autorun/Cargo.toml
 ```
 
-Load it either way upstream supports:
+The result is `target/release/autorun.dll`. Rename it to
+`gmsv_autorun_win64.dll` — gmod requires that exact name to load it as a module.
 
-* **Menu plugin** — put the DLL in `garrysmod/lua/bin/` and add
-  `require("autorun")` at the bottom of `garrysmod/lua/menu/menu.lua`.
-* **Injection** — inject it into gmod from the menu with any 64-bit injector.
+### The extension
 
-### 2. The extension
-
-Download the `.vsix` from [Releases](../../releases/latest) and:
+Needs [Node.js](https://nodejs.org/) 18 or newer.
 
 ```sh
-code --install-extension gluabridge-0.1.0.vsix
-```
-
-Or build it:
-
-```sh
-cd vscode-autorun
+cd gluabridge
 npm install
 npm run compile
-npx @vscode/vsce package --skip-license
-code --install-extension gluabridge-0.1.0.vsix --force
+npx @vscode/vsce package --skip-license --out gluabridge.vsix
 ```
+
+`npm run compile` turns the TypeScript in `src/` into JavaScript in `out/`;
+`vsce package` zips that into the installable `gluabridge.vsix`.
+
+To develop instead of package: open the `gluabridge` folder in VSCode and press
+**F5**. That opens a second VSCode with the extension loaded, and reloads it when
+you recompile.
+
+## Setup
+
+### 1. Load the DLL
+
+Either way works:
+
+* **Menu plugin** — put `gmsv_autorun_win64.dll` in `garrysmod/lua/bin/` and add
+  `require("autorun")` at the bottom of `garrysmod/lua/menu/menu.lua`. It then
+  loads every time gmod starts.
+* **Injection** — inject it into gmod from the main menu with any 64-bit
+  injector.
+
+### 2. Install the extension
+
+```sh
+code --install-extension gluabridge.vsix
+```
+
+Or in VSCode: Extensions panel → `...` menu → **Install from VSIX**.
 
 ### 3. Turn on file dumping
 
-In `%USERPROFILE%\autorun\settings.toml`:
+Autorun only saves the files a server sends you if you ask it to. In
+`%USERPROFILE%\autorun\settings.toml`:
 
 ```toml
 [filesteal]
 enabled = true
 ```
 
-Off by default upstream; the dump-folder mount needs it.
+Off by default; the dump-folder mount needs it.
 
 ## Using it
 
@@ -90,7 +119,7 @@ itself when you join a server.
 
 The DLL opens a line-delimited JSON socket on `127.0.0.1:3005`. Protocol lives in
 [`autorun/src/ipc/`](autorun/src/ipc/) and is mirrored in
-[`vscode-autorun/src/protocol.ts`](vscode-autorun/src/protocol.ts).
+[`gluabridge/src/protocol.ts`](gluabridge/src/protocol.ts).
 
 > **Security:** that socket is unauthenticated and grants arbitrary Lua execution
 > in your game client. It binds to loopback only. Do not forward the port, and do

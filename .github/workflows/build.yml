@@ -2,7 +2,6 @@ name: Build
 
 on:
   push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -25,11 +24,11 @@ jobs:
       - name: Build
         run: |
           cargo +nightly build --release --manifest-path autorun/Cargo.toml
-          move target/release/autorun.dll gmsv_autorun_win64.dll
+          move target\release\autorun.dll gmsv_autorun_win64.dll
 
       - uses: actions/upload-artifact@v4
         with:
-          name: gmsv_autorun_win64
+          name: dll
           path: gmsv_autorun_win64.dll
 
   extension:
@@ -37,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: vscode-autorun
+        working-directory: gluabridge
     steps:
       - uses: actions/checkout@v4
 
@@ -45,11 +44,46 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm install
-      - run: npx tsc -p ./ --noEmit
-      - run: npx --yes @vscode/vsce package --skip-license
+      - name: Install dependencies
+        run: npm install
+
+      # Compiled explicitly rather than relying on vsce's vscodePrepublish hook,
+      # which does not fire reliably when vsce is invoked through npx.
+      - name: Compile
+        run: npm run compile
+
+      - name: Package
+        run: npx --yes @vscode/vsce package --skip-license --out gluabridge.vsix
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vscode-autorun-vsix
-          path: vscode-autorun/*.vsix
+          name: vsix
+          path: gluabridge/gluabridge.vsix
+
+  release:
+    name: Publish Release
+    needs: [dll, extension]
+    # Only the default branch publishes; PR builds stop at artifacts.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      # A single rolling "Release" tag, moved to whatever commit built last.
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: Release
+          name: Release
+          body: |
+            Latest build of `${{ github.sha }}`.
+
+            * `gmsv_autorun_win64.dll` -- inject, or drop in `garrysmod/lua/bin/`
+            * `gluabridge.vsix` -- install with `code --install-extension gluabridge.vsix`
+          files: |
+            artifacts/dll/gmsv_autorun_win64.dll
+            artifacts/vsix/gluabridge.vsix

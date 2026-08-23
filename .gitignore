@@ -7,7 +7,7 @@ Cargo.lock
 *.log
 
 # Build artifacts
-/vscode-autorun/node_modules
-/vscode-autorun/out
-/vscode-autorun/package-lock.json
+/gluabridge/node_modules
+/gluabridge/out
+/gluabridge/package-lock.json
 *.vsix
