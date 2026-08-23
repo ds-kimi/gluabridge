@@ -1,0 +1,13 @@
+target
+Cargo.lock
+.vscode
+
+*.exe
+*.dll
+*.log
+
+# Build artifacts
+/vscode-autorun/node_modules
+/vscode-autorun/out
+/vscode-autorun/package-lock.json
+*.vsix

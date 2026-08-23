@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  dll:
+    name: DLL (win64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install nightly
+        run: rustup toolchain install nightly --profile minimal
+
+      - name: Test
+        run: cargo +nightly test --manifest-path autorun/Cargo.toml
+
+      - name: Build
+        run: |
+          cargo +nightly build --release --manifest-path autorun/Cargo.toml
+          move target/release/autorun.dll gmsv_autorun_win64.dll
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gmsv_autorun_win64
+          path: gmsv_autorun_win64.dll
+
+  extension:
+    name: VSCode extension
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode-autorun
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+      - run: npx tsc -p ./ --noEmit
+      - run: npx --yes @vscode/vsce package --skip-license
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vscode-autorun-vsix
+          path: vscode-autorun/*.vsix

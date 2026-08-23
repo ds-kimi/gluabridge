@@ -1,0 +1,26 @@
+[autorun]
+# Whether to hide on startup
+hide = false
+# Whether to disable terminal colors
+no_color = false
+# Whether to check if Autorun is outdated on startup
+check_version = true
+
+[plugins]
+# Whether to run saved plugins
+enabled = true
+
+[logging]
+# Whether to disable saving log files to disk in autorun/logs
+# Will still print info/errors to your console
+enabled = true
+
+[filesteal]
+# Whether to save lua files from detours in autorun/lua_dumps
+enabled = false
+
+# Format to use when saving folders
+# Valid tags:
+# <ip> IP Address of the server (with port)
+# <hostname> Hostname of the server (Currently will just return CLIENT, so don't use.)
+format = "<ip>"

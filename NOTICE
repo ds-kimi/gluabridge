@@ -1,0 +1,29 @@
+GLuaBridge
+This product includes software developed as part of Autorun-rs.
+
+Autorun-rs
+Copyright (c) Vurv78 and Autorun-rs contributors
+https://github.com/vurvdev/Autorun-rs
+Licensed under the Apache License, Version 2.0
+
+--------------------------------------------------------------------------------
+
+Modifications in this distribution
+Copyright (c) 2026 ds-kimi
+Licensed under the Apache License, Version 2.0
+
+Changes made relative to upstream Autorun-rs:
+
+  * Added autorun/src/ipc/ -- a loopback JSON control server (127.0.0.1:3005)
+    exposing lua execution, console command execution, console output capture,
+    scripthook file read/write, and dump notifications to external editors.
+  * Added console output capture by wrapping print/Msg/MsgN/MsgC in the target
+    lua realm (autorun/src/ipc/console.rs).
+  * Emitted IPC events from the existing dumper and painttraverse hooks
+    (autorun/src/hooks/).
+  * Added vscode-autorun/ -- the GLuaBridge VSCode extension, a client for the
+    above providing run-on-save, a console terminal, a dump-folder mount and a
+    Lua runner sidebar.
+  * Removed the unused `lupat` dependency, whose upstream repository no longer
+    resolves.
+  * Dropped a call to tinyget's removed `with_timeout` in autorun/src/version.rs.

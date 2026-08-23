@@ -1,0 +1,11 @@
+[workspace]
+members = [
+	"autorun",
+	"autorun-shared"
+]
+exclude = ["assets"]
+
+[profile.release]
+panic = "abort"
+opt-level = "z"
+lto = "fat"

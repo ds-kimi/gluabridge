@@ -1,0 +1,152 @@
+{
+  "name": "gluabridge",
+  "displayName": "GLuaBridge",
+  "description": "Run Lua in a live Garry's Mod client, read its console, and browse dumped server files. Front-end for Autorun-rs.",
+  "version": "0.1.0",
+  "publisher": "ds-kimi",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "autorun.connect",
+        "title": "Autorun: Connect"
+      },
+      {
+        "command": "autorun.disconnect",
+        "title": "Autorun: Disconnect"
+      },
+      {
+        "command": "autorun.runFile",
+        "title": "Autorun: Run Current File"
+      },
+      {
+        "command": "autorun.runSelection",
+        "title": "Autorun: Run Selection"
+      },
+      {
+        "command": "autorun.openDumps",
+        "title": "Autorun: Open Dump Folder in Workspace"
+      },
+      {
+        "command": "autorun.openConsole",
+        "title": "Autorun: Open Gmod Console"
+      },
+      {
+        "command": "autorun.attachConsole",
+        "title": "Autorun: Attach Console Capture"
+      },
+      {
+        "command": "autorun.focusPanel",
+        "title": "Autorun: Focus Lua Runner"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "autorun.runFile",
+        "key": "ctrl+alt+r",
+        "when": "editorLangId == lua"
+      }
+    ],
+    "configuration": {
+      "title": "Autorun",
+      "properties": {
+        "autorun.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "Host the injected Autorun IPC server listens on."
+        },
+        "autorun.port": {
+          "type": "number",
+          "default": 3005,
+          "description": "Port the injected Autorun IPC server listens on."
+        },
+        "autorun.runOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Send a lua file to the game every time it is saved."
+        },
+        "autorun.defaultRealm": {
+          "type": "string",
+          "enum": [
+            "client",
+            "menu"
+          ],
+          "default": "client",
+          "description": "Realm used when the file path gives no hint (cl_/sh_/menu_ prefixes and client/menu folders override this)."
+        },
+        "autorun.autoAddDumpFolder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Add the autorun/lua_dumps folder to the workspace once connected."
+        },
+        "autorun.reconnectInterval": {
+          "type": "number",
+          "default": 3000,
+          "description": "Milliseconds between reconnect attempts. 0 disables auto-reconnect."
+        },
+        "autorun.captureConsole": {
+          "type": "boolean",
+          "default": true,
+          "description": "Tee the gmod console output into the Gmod Console terminal."
+        },
+        "autorun.openConsoleOnStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open the Gmod Console terminal when the extension activates."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "autorun",
+          "title": "GLuaBridge",
+          "icon": "media/autorun.svg"
+        }
+      ]
+    },
+    "views": {
+      "autorun": [
+        {
+          "type": "webview",
+          "id": "autorun.panel",
+          "name": "Lua Runner"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ds-kimi/gluabridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ds-kimi/gluabridge/issues"
+  },
+  "homepage": "https://github.com/ds-kimi/gluabridge#readme",
+  "keywords": [
+    "garrysmod",
+    "gmod",
+    "lua",
+    "glua",
+    "autorun"
+  ]
+}
