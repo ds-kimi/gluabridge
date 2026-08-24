@@ -64,7 +64,7 @@ jobs:
     name: Publish Release
     needs: [dll, extension]
     # Only the default branch publishes; PR builds stop at artifacts.
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -79,6 +79,8 @@ jobs:
         with:
           tag_name: Release
           name: Release
+          make_latest: true
+          prerelease: false
           body: |
             Latest build of `${{ github.sha }}`.
 
